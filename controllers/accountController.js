@@ -63,13 +63,40 @@ class AccountController {
                     uniqueId: dbUser.uniqueId,
                     nickname: dbUser.nickname,
                     createdAt: dbUser.createdAt,
+                    avatar: dbUser.avatar,
+                }
+                const dbSnapshot = await UserSnapshot.findOne({ _id: dbUser.snapshots[0].toString() })
+                outUser.snapshots = [{
+                    followerCount: dbSnapshot.followerCount,
+                    followingCount: dbSnapshot.followingCount,
+                    videoCount: dbSnapshot.videoCount,
+                    heartCount: dbSnapshot.heartCount,
+                    createdAt: dbSnapshot.createdAt,
+                }]
+                out.push(outUser)
+            }
+            return res.status(200).json({ list: out })
+        } catch (e) {
+            return res.status(500).json({ message: 'Server Error' })
+        }
+    }
+
+    async getUserInfo (req, res) {
+        try {
+            const { username, limit } = req.query
+            const account = await Account.findOne({ _id: req.account.id })
+            const dbUser = await User.findOne({ uniqueId: username })
+            if (account.users.includes(dbUser._id)) {
+                const outUser = {
+                    uniqueId: dbUser.uniqueId,
+                    nickname: dbUser.nickname,
+                    createdAt: dbUser.createdAt,
                     avatar: dbUser.avatar
                 }
                 const outSnapshots = []
-                for (const snapshot of dbUser.snapshots) {
-                    console.log(snapshot)
+                const slicedSnapshots = dbUser.snapshots.slice(0, limit)
+                for (const snapshot of slicedSnapshots) {
                     const dbSnapshot = await UserSnapshot.findOne({ _id: snapshot.toString() })
-                    console.log(dbSnapshot)
                     outSnapshots.push({
                         followerCount: dbSnapshot.followerCount,
                         followingCount: dbSnapshot.followingCount,
@@ -79,12 +106,11 @@ class AccountController {
                     })
                 }
                 outUser.snapshots = outSnapshots
-                out.push(outUser)
+                return res.status(200).json({ user: outUser })
+            } else {
+                res.status(404).json({ message: 'User not found' })
             }
-            return res.status(200).json({ list: out })
-        } catch
-            (e) {
-            console.log(e)
+        } catch (e) {
             return res.status(500).json({ message: 'Server Error' })
         }
     }
