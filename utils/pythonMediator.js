@@ -17,7 +17,7 @@ class PythonMediator {
                 if (res) {
                     resolve(res[0])
                 }
-                resolve(undefined)
+                resolve()
             })
         })
     }
