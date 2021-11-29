@@ -18,8 +18,12 @@ class AccountController {
                 await account.save()
                 return res.status(200).json({ message: 'User added successfully' })
             }
-
-            const tiktokUser = await tiktokService.getUser(req.body.username)
+            let tiktokUser = null
+            while (!tiktokUser) {
+                await tiktokService.getUser(req.body.username).then((data) => {
+                    tiktokUser = data
+                }).catch(() => console.log('Error adding to account. Retrying...'))
+            }
             const userToCreate = new User({
                 userId: tiktokUser.userInfo.user.id,
                 secUid: tiktokUser.userInfo.user.secUid,

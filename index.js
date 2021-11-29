@@ -33,11 +33,13 @@ const start = async () => {
 
 const CronJob = require('cron').CronJob
 
-// const job = new CronJob('30 * * * * *', async () => {
-const job = new CronJob('0 2 * * *', async () => {
-    await makeUsersSnapshot()
-})
+// const job = new CronJob('20 * * * * *', async () => {
+// const job = new CronJob('0 2 * * *', async () => {
+//     await makeUsersSnapshot()
+// })
 
-job.start()
+// job.start(
+
+makeUsersSnapshot()
 
 start()
